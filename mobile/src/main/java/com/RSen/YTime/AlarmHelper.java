@@ -46,7 +46,9 @@ public class AlarmHelper extends BroadcastReceiver {
             Toast.makeText(context, "New duration:" + duration, Toast.LENGTH_LONG).show();
             int arriveMinutes = alarm.getArriveHours() * 60 + alarm.getArriveMinutes();
             arriveMinutes -= duration;
-            dataSource.updateAlarmTime(id, arriveMinutes / 60, arriveMinutes % 60);
+            alarm.setWakeupHours(arriveMinutes / 60);
+            alarm.setWakeupMinutes(arriveMinutes % 60);
+            dataSource.updateAlarm(alarm);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -85,7 +87,9 @@ public class AlarmHelper extends BroadcastReceiver {
                         calendar.set(Calendar.HOUR_OF_DAY, alarm.getArriveHours());
                         calendar.set(Calendar.MINUTE, alarm.getArriveMinutes());
                         calendar.add(Calendar.MINUTE, -1 * duration);
-                        dataSource.updateAlarmTime(alarm.getId(), calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE));
+                        alarm.setWakeupHours(calendar.get(Calendar.HOUR_OF_DAY));
+                        alarm.setWakeupMinutes(calendar.get(Calendar.MINUTE));
+                        dataSource.updateAlarm(alarm);
                     }
 
                     if (calendar.before(Calendar.getInstance()))
@@ -131,10 +135,10 @@ public class AlarmHelper extends BroadcastReceiver {
                     else {
                         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
                         if (Build.VERSION.SDK_INT > 18) {
-                            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), PendingIntent.getActivity(context, 1928, new Intent(context, WakeupActivity.class), 0));
+                            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), PendingIntent.getActivity(context, 1928, new Intent(context, WakeupActivity.class), PendingIntent.FLAG_ONE_SHOT));
                         }
                         else {
-                            alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), PendingIntent.getActivity(context, 1928, new Intent(context, WakeupActivity.class), 0));
+                            alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), PendingIntent.getActivity(context, 1928, new Intent(context, WakeupActivity.class), PendingIntent.FLAG_ONE_SHOT));
 
                         }
                     }

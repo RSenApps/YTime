@@ -56,19 +56,25 @@ public class AlarmsDataSource {
                 + " = " + id, null);
     }
 
-    public void updateAlarmTime(long id, int wakeupHours, int wakeupMinutes) {
+    public void updateAlarm(Alarm alarm) {
 
         ContentValues values = new ContentValues();
-        values.put(MySQLiteHelper.COLUMN_WAKEUP_HOURS, wakeupHours);
-        values.put(MySQLiteHelper.COLUMN_WAKEUP_MINUTES, wakeupMinutes);
+        values.put(MySQLiteHelper.COLUMN_IS_LOCATION, 1);
+        values.put(MySQLiteHelper.COLUMN_LAT, alarm.getLat());
+        values.put(MySQLiteHelper.COLUMN_LNG, alarm.getLng());
+        values.put(MySQLiteHelper.COLUMN_ARRIVE_HOURS, alarm.getArriveHours());
+        values.put(MySQLiteHelper.COLUMN_ARRIVE_MINUTES, alarm.getArriveMinutes());
+        values.put(MySQLiteHelper.COLUMN_GET_READY, alarm.getGetReady());
+        values.put(MySQLiteHelper.COLUMN_WAKEUP_HOURS, alarm.getWakeupHours());
+        values.put(MySQLiteHelper.COLUMN_WAKEUP_MINUTES, alarm.getWakeupMinutes());
         database.update(MySQLiteHelper.TABLE_ALARMS, values,  MySQLiteHelper.COLUMN_ID
-                + " = " + id, null);
+                + " = " + alarm.getId(), null);
 
     }
     public Alarm getAlarmById(long id)
     {
         Cursor cursor = database.query(MySQLiteHelper.TABLE_ALARMS, allColumns, MySQLiteHelper.COLUMN_ID
-                + "=?", new String[] {String.valueOf(id)}, null, null, null, "1" );
+                + "="+id, null, null, null, null, "1" );
         cursor.moveToFirst();
         Alarm returnAlarm = null;
         if (!cursor.isAfterLast())
@@ -100,4 +106,29 @@ public class AlarmsDataSource {
                 cursor.getDouble(3), cursor.getInt(4), cursor.getInt(5), cursor.getInt(6), cursor.getInt(7), cursor.getInt(8));
         return alarm;
     }
+    public void addLocation (String name, double lat, double lng) {
+        ContentValues values = new ContentValues();
+        values.put(MySQLiteHelper.COLUMN_NAME, name);
+        values.put(MySQLiteHelper.COLUMN_LAT, lat);
+        values.put(MySQLiteHelper.COLUMN_LNG, lng);
+
+        database.insert(MySQLiteHelper.TABLE_LOCATIONS, null,
+                values);
+    }
+    public List<String> getLocationNames () {
+        List<String> locations = new ArrayList<String>();
+
+        Cursor cursor = database.query(MySQLiteHelper.TABLE_LOCATIONS,
+                new String[] {MySQLiteHelper.COLUMN_ID}, null, null, null, null, null);
+
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+           locations.add(cursor.getString(cursor.getColumnIndex(MySQLiteHelper.COLUMN_NAME)));
+            cursor.moveToNext();
+        }
+        // make sure to close the cursor
+        cursor.close();
+        return locations;
+    }
+
 }

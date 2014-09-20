@@ -29,7 +29,6 @@ public class AlarmService extends Service implements
         GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener {
     LocationClient mLocationClient;
-    private final static UUID PEBBLE_APP_UUID = UUID.fromString("bc20efe8-f0a9-4d86-912c-a4293b3df8da");
     long id;
     @Override
     public IBinder onBind(Intent intent) {
@@ -38,16 +37,22 @@ public class AlarmService extends Service implements
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        id = intent.getLongExtra("id", -1);
-        if (id != -1)
-        {
-            mLocationClient = new LocationClient(this, this, this);
-            mLocationClient.connect();
+        if (intent!= null) {
+            id = intent.getLongExtra("id", -1);
+            if (id != -1)
+            {
+                mLocationClient = new LocationClient(this, this, this);
+                mLocationClient.connect();
 
+            }
+            else {
+                stopSelf();
+            }
         }
         else {
             stopSelf();
         }
+
 
         return super.onStartCommand(intent, flags, startId);
     }

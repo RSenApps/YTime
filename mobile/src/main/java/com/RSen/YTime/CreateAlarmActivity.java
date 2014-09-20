@@ -40,6 +40,7 @@ public class CreateAlarmActivity extends Activity implements
     AlarmsDataSource dataSource;
     double lat = 0;
     double lng = 0;
+    String placeName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,6 +94,7 @@ public class CreateAlarmActivity extends Activity implements
                         public void run() {
                             dataSource.createLocationAlarm(lat, lng, hours, minutes, Integer.parseInt(getReadyInput.getText().toString()));
                             AlarmHelper.setAlarms(CreateAlarmActivity.this, mLocationClient);
+                            dataSource.addLocation(placeName, lat, lng);
                         }
                     });
                     thread.start();
@@ -145,6 +147,7 @@ public class CreateAlarmActivity extends Activity implements
                         MarkerOptions options = new MarkerOptions();
                         options.position((LatLng) message.obj);
                         options.title(adapter.getItem(i));
+                        placeName = adapter.getItem(i);
                         map.addMarker(options);
                         return true;
                     }

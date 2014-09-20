@@ -8,6 +8,8 @@ import android.os.IBinder;
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 
+import java.sql.SQLException;
+
 public class PebbleListeningService extends Service {
     public PebbleListeningService() {
     }
@@ -24,7 +26,15 @@ public class PebbleListeningService extends Service {
             @Override
             public void receiveData(final Context context, final int transactionId, final PebbleDictionary data) {
                 //if request locations
+                AlarmsDataSource dataSource = new AlarmsDataSource(PebbleListeningService.this);
+                try {
+                    dataSource.open();
+                    dataSource.getLocationNames();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
 
+                dataSource.close();
                 PebbleKit.sendAckToPebble(getApplicationContext(), transactionId);
             }
         });

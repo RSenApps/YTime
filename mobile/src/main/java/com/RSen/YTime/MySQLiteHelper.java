@@ -33,8 +33,9 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + " integer primary key autoincrement, " + COLUMN_IS_LOCATION
             + " integer, " + COLUMN_LAT + " real, " + COLUMN_LNG + " real, "
             + COLUMN_ARRIVE_HOURS + " integer, " + COLUMN_ARRIVE_MINUTES + " integer, " + COLUMN_WAKEUP_HOURS + " integer, "
-            + COLUMN_WAKEUP_MINUTES + " integer, " + COLUMN_GET_READY + " integer); create table " + TABLE_LOCATIONS
-            + " (" + COLUMN_ID + " integer primary key autoincrement, " + COLUMN_NAME + " text, " + COLUMN_LAT + " real, "
+            + COLUMN_WAKEUP_MINUTES + " integer, " + COLUMN_GET_READY + " integer);";
+    private static final String DATABASE_CREATE2 = "create table " + TABLE_LOCATIONS
+            + "(" + COLUMN_ID + " integer primary key autoincrement, " + COLUMN_NAME + " text, " + COLUMN_LAT + " real, "
             + COLUMN_LNG + " real);";
 
     public MySQLiteHelper(Context context) {
@@ -44,6 +45,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase database) {
         database.execSQL(DATABASE_CREATE);
+        database.execSQL(DATABASE_CREATE2);
     }
 
     @Override
