@@ -81,6 +81,24 @@ public class CreateAlarmActivity extends Activity implements
                 @Override
                 public void onClick(View view) {
                     dataSource.createLocationAlarm(lat, lng, hours, minutes, Integer.parseInt(getReadyInput.getText().toString()));
+                    final Handler handler = new Handler(new Handler.Callback() {
+                        @Override
+                        public boolean handleMessage(Message message) {
+                            Toast.makeText(CreateAlarmActivity.this, "Estimated time to location: " + message.obj.toString(), Toast.LENGTH_LONG).show();
+                            return true;
+                        }
+                    });
+                    Thread thread = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Message message = handler.obtainMessage();
+                            Location current = mLocationClient.getLastLocation();
+                            message.obj = BingMapsAPI.getTimeToLocation(current.getLatitude(), current.getLongitude(), lat, lng, hours, minutes, BingMapsAPI.TRANSIT_MODE.driving, true);
+                            handler.sendMessage(message);
+                        }
+                    });
+                    thread.start();
+
                 }
             });
         }
