@@ -26,7 +26,7 @@ import java.util.HashMap;
 /**
  * Created by Ryan on 9/20/2014.
  */
-public class MapsAPI {
+public class GoogleMapsAPI {
     private static final String PLACES_API_BASE = "https://maps.googleapis.com/maps/api/place";
     private static final String TYPE_AUTOCOMPLETE = "/autocomplete";
     private static final String TYPE_DETAIL = "/details";

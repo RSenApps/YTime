@@ -2,31 +2,31 @@ package com.RSen.YTime;
 
 import android.app.Activity;
 import android.content.IntentSender;
-import android.graphics.Camera;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
-import android.widget.RadioButton;
-import android.widget.TextView;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.datetimepicker.time.RadialPickerLayout;
+import com.android.datetimepicker.time.TimePickerDialog;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.MarkerOptionsCreator;
+
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 
 public class CreateAlarmActivity extends Activity implements
@@ -34,19 +34,55 @@ public class CreateAlarmActivity extends Activity implements
         GooglePlayServicesClient.OnConnectionFailedListener{
     LocationClient mLocationClient;
     GoogleMap map;
+    int hours = 12;
+    int minutes = 0;
+    AlarmsDataSource dataSource;
+    double lat = 0;
+    double lng = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_alarm);
-        if (MapsAPI.servicesConnected(this)) {
+        if (GoogleMapsAPI.servicesConnected(this)) {
+            dataSource = new AlarmsDataSource(this);
+            try {
+                dataSource.open();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             MapFragment mapFragment = ((MapFragment) getFragmentManager().findFragmentById(R.id.map));
             map = mapFragment.getMap();
             map.setTrafficEnabled(true);
             map.setMyLocationEnabled(true);
 
             mLocationClient = new LocationClient(this, this, this);
-
-
+            final EditText getReadyInput = (EditText) findViewById(R.id.get_ready_input);
+            final EditText timeInput = (EditText) findViewById(R.id.time_input);
+            timeInput.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    TimePickerDialog dialog = TimePickerDialog.newInstance(new TimePickerDialog.OnTimeSetListener() {
+                        @Override
+                        public void onTimeSet(RadialPickerLayout radialPickerLayout, int i, int i2) {
+                            hours = i;
+                            minutes = i2;
+                            Calendar date = Calendar.getInstance();
+                            date.set(Calendar.HOUR_OF_DAY, i);
+                            date.set(Calendar.MINUTE, i2);
+                            DateFormat dateFormat = new SimpleDateFormat("hh:mm a");
+                            timeInput.setText(dateFormat.format(date.getTime()));
+                        }
+                    }, hours, minutes, false);
+                    dialog.setThemeDark(true);
+                    dialog.show(getFragmentManager(), "timepicker");
+                }
+            });
+            findViewById(R.id.create).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    dataSource.createLocationAlarm(lat, lng, hours, minutes, Integer.parseInt(getReadyInput.getText().toString()));
+                }
+            });
         }
     }
     @Override
@@ -94,7 +130,10 @@ public class CreateAlarmActivity extends Activity implements
                     @Override
                     public void run() {
                         Message message = handler.obtainMessage();
-                        message.obj  = MapsAPI.getLocationForPlace(adapter.getPlaceID(i));
+                        LatLng latLng  = GoogleMapsAPI.getLocationForPlace(adapter.getPlaceID(i));
+                        lat = latLng.latitude;
+                        lng = latLng.longitude;
+                        message.obj = latLng;
                         handler.sendMessage(message);
                     }
                 });
@@ -102,6 +141,8 @@ public class CreateAlarmActivity extends Activity implements
 
             }
         });
+
+
     }
     /*
      * Called by Location Services if the connection to the
