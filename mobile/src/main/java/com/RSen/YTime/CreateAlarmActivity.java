@@ -1,6 +1,7 @@
 package com.RSen.YTime;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.content.IntentSender;
 import android.location.Location;
 import android.os.Bundle;
@@ -45,11 +46,7 @@ public class CreateAlarmActivity extends Activity implements
         setContentView(R.layout.activity_create_alarm);
         if (GoogleMapsAPI.servicesConnected(this)) {
             dataSource = new AlarmsDataSource(this);
-            try {
-                dataSource.open();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+
             MapFragment mapFragment = ((MapFragment) getFragmentManager().findFragmentById(R.id.map));
             map = mapFragment.getMap();
             map.setTrafficEnabled(true);
@@ -80,24 +77,26 @@ public class CreateAlarmActivity extends Activity implements
             findViewById(R.id.create).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    dataSource.createLocationAlarm(lat, lng, hours, minutes, Integer.parseInt(getReadyInput.getText().toString()));
+                    /*
                     final Handler handler = new Handler(new Handler.Callback() {
                         @Override
                         public boolean handleMessage(Message message) {
                             Toast.makeText(CreateAlarmActivity.this, "Estimated time to location: " + message.obj.toString(), Toast.LENGTH_LONG).show();
+
                             return true;
                         }
                     });
+                    */
+
                     Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            Message message = handler.obtainMessage();
-                            Location current = mLocationClient.getLastLocation();
-                            message.obj = BingMapsAPI.getTimeToLocation(current.getLatitude(), current.getLongitude(), lat, lng, hours, minutes, BingMapsAPI.TRANSIT_MODE.driving, true);
-                            handler.sendMessage(message);
+                            dataSource.createLocationAlarm(lat, lng, hours, minutes, Integer.parseInt(getReadyInput.getText().toString()));
+                            AlarmHelper.setAlarms(CreateAlarmActivity.this, mLocationClient);
                         }
                     });
                     thread.start();
+
 
                 }
             });
@@ -106,6 +105,11 @@ public class CreateAlarmActivity extends Activity implements
     @Override
     protected void onStart() {
         super.onStart();
+        try {
+            dataSource.open();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         // Connect the client.
         mLocationClient.connect();
     }
@@ -116,6 +120,7 @@ public class CreateAlarmActivity extends Activity implements
     protected void onStop() {
         // Disconnecting the client invalidates it.
         mLocationClient.disconnect();
+        dataSource.close();
         super.onStop();
     }
     @Override

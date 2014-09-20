@@ -10,30 +10,68 @@ public class Alarm {
     private boolean locationBased = true;
     private double lat = 0;
     private double lng = 0;
-    private int hours = 0;
-    private int minutes = 0;
+    private int arriveHours = 0;
+    private int arriveMinutes = 0;
+    private int wakeupHours = 0;
+
+    public int getArriveHours() {
+        return arriveHours;
+    }
+
+    public void setArriveHours(int arriveHours) {
+        this.arriveHours = arriveHours;
+    }
+
+    public int getArriveMinutes() {
+        return arriveMinutes;
+    }
+
+    public void setArriveMinutes(int arriveMinutes) {
+        this.arriveMinutes = arriveMinutes;
+    }
+
+    public int getWakeupHours() {
+        return wakeupHours;
+    }
+
+    public void setWakeupHours(int wakeupHours) {
+        this.wakeupHours = wakeupHours;
+    }
+
+    public int getWakeupMinutes() {
+        return wakeupMinutes;
+    }
+
+    public void setWakeupMinutes(int wakeupMinutes) {
+        this.wakeupMinutes = wakeupMinutes;
+    }
+
+    private int wakeupMinutes = 0;
     private int getReady = 0;
-    public Alarm(long id, double lat, double lng, int hours, int minutes, int getready)
+    private boolean enabled = true;
+    public Alarm(long id, double lat, double lng, int arriveHours, int arriveMinutes, int getready)
     {
         locationBased = true;
         this.lat = lat;
         this.lng = lng;
-        this.hours = hours;
-        this.minutes = minutes;
+        this.arriveHours = arriveHours;
+        this.arriveMinutes = arriveMinutes;
     }
     public Alarm(long id, int hours, int minutes)
     {
         locationBased = false;
-        this.hours = hours;
-        this.minutes = minutes;
+        this.wakeupHours = hours;
+        this.wakeupMinutes = minutes;
     }
-    public Alarm(long id, int isLocation, double lat, double lng, int hours, int minutes, int getready)
+    public Alarm(long id, int isLocation, double lat, double lng, int arriveHours, int arriveMinutes, int wakeupHours, int wakeupMinutes, int getready)
     {
         locationBased = (isLocation != 0);
         this.lat = lat;
         this.lng = lng;
-        this.hours = hours;
-        this.minutes = minutes;
+        this.arriveHours = arriveHours;
+        this.arriveMinutes = arriveMinutes;
+        this.wakeupHours = wakeupHours;
+        this.wakeupMinutes = wakeupMinutes;
 
     }
     public long getId()
@@ -68,21 +106,7 @@ public class Alarm {
         this.lng = lng;
     }
 
-    public int getHours() {
-        return hours;
-    }
 
-    public void setHours(int hours) {
-        this.hours = hours;
-    }
-
-    public int getMinutes() {
-        return minutes;
-    }
-
-    public void setMinutes(int minutes) {
-        this.minutes = minutes;
-    }
     public int getGetReady()
     {
         return getReady;
@@ -91,8 +115,8 @@ public class Alarm {
     {
         this.getReady = getReady;
     }
-
-
+    public boolean isEnabled () {return enabled;}
+    public void setEnabled (boolean enabled) {this.enabled = enabled;}
 
 
 

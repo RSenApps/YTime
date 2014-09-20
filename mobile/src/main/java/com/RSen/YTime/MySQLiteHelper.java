@@ -10,15 +10,19 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class MySQLiteHelper extends SQLiteOpenHelper {
 
     public static final String TABLE_ALARMS = "alarms";
+    public static final String TABLE_LOCATIONS = "locations";
     public static final String COLUMN_ID = "_id";
     //0=location, 1=time
     public static final String COLUMN_IS_LOCATION = "location";
     public static final String COLUMN_LAT = "lat";
     public static final String COLUMN_LNG = "lng";
-    public static final String COLUMN_HOURS = "hours";
-    public static final String COLUMN_MINUTES = "minutes";
-
+    public static final String COLUMN_ARRIVE_HOURS = "arrivehours";
+    public static final String COLUMN_ARRIVE_MINUTES = "arriveminutes";
+    public static final String COLUMN_WAKEUP_HOURS = "wakeuphours";
+    public static final String COLUMN_WAKEUP_MINUTES = "wakeupminutes";
     public static final String COLUMN_GET_READY = "getready";
+
+    public static final String COLUMN_NAME = "name";
 
     private static final String DATABASE_NAME = "alarms.db";
     private static final int DATABASE_VERSION = 1;
@@ -28,7 +32,10 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + TABLE_ALARMS + "(" + COLUMN_ID
             + " integer primary key autoincrement, " + COLUMN_IS_LOCATION
             + " integer, " + COLUMN_LAT + " real, " + COLUMN_LNG + " real, "
-            + COLUMN_HOURS + " integer, " + COLUMN_MINUTES + " integer, " + COLUMN_GET_READY + " integer);";
+            + COLUMN_ARRIVE_HOURS + " integer, " + COLUMN_ARRIVE_MINUTES + " integer, " + COLUMN_WAKEUP_HOURS + " integer, "
+            + COLUMN_WAKEUP_MINUTES + " integer, " + COLUMN_GET_READY + " integer); create table " + TABLE_LOCATIONS
+            + " (" + COLUMN_ID + " integer primary key autoincrement, " + COLUMN_NAME + " text, " + COLUMN_LAT + " real, "
+            + COLUMN_LNG + " real);";
 
     public MySQLiteHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);

@@ -24,4 +24,5 @@ dependencies {
     wearApp project(':wear')
     compile 'com.google.android.gms:play-services:5.0.89'
     compile 'com.github.citux:datetimepicker:0.1.0'
+    compile 'com.getpebble:pebblekit:2.5.0'
 }
