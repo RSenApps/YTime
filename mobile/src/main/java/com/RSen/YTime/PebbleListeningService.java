@@ -9,6 +9,8 @@ import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 
 import java.sql.SQLException;
+import java.util.Calendar;
+import java.util.List;
 
 public class PebbleListeningService extends Service {
     public PebbleListeningService() {
@@ -26,16 +28,29 @@ public class PebbleListeningService extends Service {
             @Override
             public void receiveData(final Context context, final int transactionId, final PebbleDictionary data) {
                 //if request locations
-                AlarmsDataSource dataSource = new AlarmsDataSource(PebbleListeningService.this);
-                try {
-                    dataSource.open();
-                    dataSource.getLocationNames();
-                } catch (SQLException e) {
-                    e.printStackTrace();
+                PebbleKit.sendAckToPebble(getApplicationContext(), transactionId);
+                if (data.getInteger(0) == 1)
+                {
+                    AlarmsDataSource dataSource = new AlarmsDataSource(PebbleListeningService.this);
+                    String locationsString = "";
+                    try {
+                        dataSource.open();
+                        List<String> locationsList = dataSource.getLocationNames();
+                        for (String location : locationsList)
+                        {
+                            locationsString += location + ",";
+                        }
+                        locationsString = locationsString.substring(locationsString.length()-1);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    dataSource.close();
+                    PebbleDictionary returnData = new PebbleDictionary();
+                    data.addString(0, locationsString);
+                    PebbleKit.sendDataToPebble(context, AlarmHelper.PEBBLE_APP_UUID, returnData);
                 }
 
-                dataSource.close();
-                PebbleKit.sendAckToPebble(getApplicationContext(), transactionId);
             }
         });
         return super.onStartCommand(intent, flags, startId);

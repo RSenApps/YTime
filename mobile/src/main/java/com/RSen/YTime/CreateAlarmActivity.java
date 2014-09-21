@@ -2,11 +2,14 @@ package com.RSen.YTime;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.content.Context;
+import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
@@ -15,6 +18,8 @@ import android.widget.Toast;
 
 import com.android.datetimepicker.time.RadialPickerLayout;
 import com.android.datetimepicker.time.TimePickerDialog;
+import com.getpebble.android.kit.PebbleKit;
+import com.getpebble.android.kit.util.PebbleDictionary;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
@@ -46,6 +51,8 @@ public class CreateAlarmActivity extends Activity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_alarm);
         if (GoogleMapsAPI.servicesConnected(this)) {
+            startService(new Intent(this, PebbleListeningService.class));
+
             dataSource = new AlarmsDataSource(this);
 
             MapFragment mapFragment = ((MapFragment) getFragmentManager().findFragmentById(R.id.map));
@@ -92,7 +99,7 @@ public class CreateAlarmActivity extends Activity implements
                     Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            dataSource.createLocationAlarm(lat, lng, hours, minutes, Integer.parseInt(getReadyInput.getText().toString()));
+                            dataSource.createLocationAlarm(lat, lng, hours, minutes, Integer.parseInt(getReadyInput.getText().toString()), placeName);
                             AlarmHelper.setAlarms(CreateAlarmActivity.this, mLocationClient);
                             dataSource.addLocation(placeName, lat, lng);
                         }

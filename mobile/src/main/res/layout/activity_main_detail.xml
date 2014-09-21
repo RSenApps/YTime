@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Repeat"
+        android:focusable="false"
+        android:id="@+id/repeat" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:id="@+id/repeatButtons"
+        android:visibility="gone"
+        android:layout_height="wrap_content">
+
+        <ToggleButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:textOn="M"
+            android:textOff="M"
+            android:id="@+id/mon" />
+
+        <ToggleButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:textOn="T"
+            android:textOff="T"
+            android:id="@+id/tue" />
+        <ToggleButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:textOn="W"
+            android:textOff="W"
+            android:id="@+id/wed" />
+        <ToggleButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:textOn="T"
+            android:textOff="T"
+            android:id="@+id/thu" />
+        <ToggleButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:textOn="F"
+            android:textOff="F"
+            android:id="@+id/fri" />
+        <ToggleButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:textOn="S"
+            android:textOff="S"
+            android:id="@+id/sat" />
+        <ToggleButton
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:textOn="S"
+            android:textOff="S"
+            android:id="@+id/sun" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Ringtone"
+            android:drawableLeft="@drawable/ic_note"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:id="@+id/ringtone"
+            android:gravity="center_vertical" />
+
+        <CheckBox
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Vibrate"
+            android:focusable="false"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:id="@+id/vibrate" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Driving"
+            android:drawableLeft="@drawable/ic_transportation_mode"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:id="@+id/mode_transportation"
+           android:layout_centerVertical="true" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text=" min prep"
+            android:layout_alignParentRight="true"
+
+            android:id="@+id/textView"
+            android:layout_centerVertical="true" />
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_toLeftOf="@id/textView"
+            android:id="@+id/prep"
+            android:layout_height="wrap_content"
+            android:text="30" />
+
+
+
+    </RelativeLayout>
+
+</LinearLayout>

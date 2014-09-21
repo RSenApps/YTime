@@ -45,7 +45,7 @@ public class AlarmHelper extends BroadcastReceiver {
             int duration = BingMapsAPI.getTimeToLocation(location.getLatitude(), location.getLongitude(), alarm.getLat(), alarm.getLng(), alarm.getArriveHours(), alarm.getArriveMinutes(), BingMapsAPI.TRANSIT_MODE.driving, true);
             Toast.makeText(context, "New duration:" + duration, Toast.LENGTH_LONG).show();
             int arriveMinutes = alarm.getArriveHours() * 60 + alarm.getArriveMinutes();
-            arriveMinutes -= duration;
+            arriveMinutes -= duration + alarm.getGetReady();
             alarm.setWakeupHours(arriveMinutes / 60);
             alarm.setWakeupMinutes(arriveMinutes % 60);
             dataSource.updateAlarm(alarm);
@@ -86,12 +86,12 @@ public class AlarmHelper extends BroadcastReceiver {
 
                         calendar.set(Calendar.HOUR_OF_DAY, alarm.getArriveHours());
                         calendar.set(Calendar.MINUTE, alarm.getArriveMinutes());
-                        calendar.add(Calendar.MINUTE, -1 * duration);
+                        calendar.add(Calendar.MINUTE, -1 * (duration));
                         alarm.setWakeupHours(calendar.get(Calendar.HOUR_OF_DAY));
                         alarm.setWakeupMinutes(calendar.get(Calendar.MINUTE));
                         dataSource.updateAlarm(alarm);
                     }
-
+                    calendar.add(Calendar.MINUTE, -1 * alarm.getGetReady());
                     if (calendar.before(Calendar.getInstance()))
                     {
                         calendar.add(Calendar.DATE, 1);
@@ -100,7 +100,7 @@ public class AlarmHelper extends BroadcastReceiver {
 
 
 
-                    long minutesBeforeAlarm = calendar.getTime().getTime() - Calendar.getInstance().getTime().getTime()/1000/60;
+                    long minutesBeforeAlarm = (calendar.getTime().getTime() - Calendar.getInstance().getTime().getTime())/1000/60;
                     if (nextAlarmTime == null || nextAlarmTime.after(calendar))
                     {
                         nextAlarmTime = calendar;
