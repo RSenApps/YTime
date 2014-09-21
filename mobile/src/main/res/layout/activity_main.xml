@@ -1,15 +1,57 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    xmlns:fab="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent">
 
-    tools:context="com.RSen.YTime.MainActivity">
+    <RelativeLayout
 
-    <ExpandableListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/expandableListView"
-        android:layout_alignParentLeft="true"
 
-        android:layout_alignParentStart="true" />
-</RelativeLayout>
+        tools:context="com.RSen.YTime.MainActivity">
+
+        <ExpandableListView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/expandableListView"
+            android:layout_alignParentLeft="true"
+            android:layout_centerHorizontal="true"
+
+            android:layout_alignParentStart="true" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/noalarmsText"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom = "100dp"
+            android:layout_alignParentBottom="true"
+            android:visibility="gone"
+            android:textSize="50sp"
+            android:textColor="@android:color/holo_red_dark"
+            android:text="No Alarms"/>
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/noalarms"
+            android:layout_alignParentLeft="true"
+            android:layout_centerHorizontal="true"
+            android:visibility="gone"
+            android:layout_above="@id/noalarmsText"
+            android:layout_alignParentStart="true"
+            android:src="@drawable/ic_alarm"/>
+
+
+    </RelativeLayout>
+    <com.melnykov.fab.FloatingActionButton
+        android:id="@+id/add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_add"
+        fab:fab_colorNormal="@android:color/holo_red_dark"
+        fab:fab_colorPressed="@android:color/holo_red_light"/>
+</FrameLayout>
+

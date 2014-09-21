@@ -4,30 +4,54 @@ package com.RSen.YTime;
  * Created by Ryan on 9/20/2014.
  */
 import java.sql.SQLException;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Typeface;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import com.android.datetimepicker.time.RadialPickerLayout;
+import com.android.datetimepicker.time.TimePickerDialog;
 
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     private Context _context;
-    private List<Alarm> alarms;
-    public ExpandableListAdapter(Context context, List<Alarm> alarms) {
+    public List<Alarm> alarms;
+    ImageView noAlarmImage;
+    TextView noAlarmText;
+    public ExpandableListAdapter(Context context, List<Alarm> alarms, ImageView noAlarmImage, TextView noAlarmText) {
         this._context = context;
         this.alarms = alarms;
+        this.noAlarmImage = noAlarmImage;
+        this.noAlarmText = noAlarmText;
     }
-
+    private void updateNoAlarmStatus()
+    {
+        if (alarms != null && alarms.size() > 0) {
+            noAlarmImage.setVisibility(View.GONE);
+            noAlarmText.setVisibility(View.GONE);
+        }
+        else {
+            noAlarmImage.setVisibility(View.VISIBLE);
+            noAlarmText.setVisibility(View.VISIBLE);
+        }
+    }
     @Override
     public Object getChild(int groupPosition, int childPosititon) {
         return alarms.get(groupPosition);
@@ -39,22 +63,40 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public View getChildView(int groupPosition, final int childPosition,
+    public View getChildView(final int groupPosition, final int childPosition,
                              boolean isLastChild, View convertView, ViewGroup parent) {
 
         final Alarm alarm = (Alarm) getChild(groupPosition, childPosition);
+
 
         if (convertView == null) {
             LayoutInflater infalInflater = (LayoutInflater) this._context
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = infalInflater.inflate(R.layout.activity_main_detail, null);
         }
-        /*
-        TextView txtListChild = (TextView) convertView
-                .findViewById(R.id.lblListItem);
+        final View view = convertView;
+        ((CheckBox) convertView.findViewById(R.id.repeat)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if(b) {
+                    view.findViewById(R.id.repeatButtons).setVisibility(View.VISIBLE);
+                }
+                else {
+                    view.findViewById(R.id.repeatButtons).setVisibility(View.GONE);
 
-        txtListChild.setText(childText);
-        */
+                }
+            }
+        });
+        convertView.findViewById(R.id.ringtone).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
+                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
+                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone");
+                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
+                ((Activity) _context).startActivityForResult(intent, groupPosition);
+            }
+        });
         return convertView;
     }
 
@@ -100,11 +142,37 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             Calendar wakeupTime = Calendar.getInstance();
             wakeupTime.set(Calendar.HOUR_OF_DAY, alarm.getWakeupHours());
             wakeupTime.set(Calendar.MINUTE, alarm.getWakeupMinutes());
-            wakeupTimeString = " (est. " + sdf.format((alarmTime.getTime())) + ")";
+            wakeupTimeString = " (est. " + sdf.format((wakeupTime.getTime())) + ")";
         }
 
         ((TextView) convertView.findViewById(R.id.time)).setText(sdf.format(alarmTime.getTime()) + wakeupTimeString);
+        ((TextView) convertView.findViewById(R.id.time)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                TimePickerDialog dialog = TimePickerDialog.newInstance(new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(RadialPickerLayout radialPickerLayout, int i, int i2) {
+                        alarm.setArriveHours(i);
+                        alarm.setArriveMinutes(i);
+                        notifyDataSetChanged();
+                        AlarmsDataSource dataSource = new AlarmsDataSource(radialPickerLayout.getContext());
+                        try {
+                            dataSource.open();
+                            dataSource.updateAlarm(alarm);
+                            AlarmHelper.setAlarms(radialPickerLayout.getContext(), null);
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                        }
+                        dataSource.close();
+                    }
+                }, alarm.getArriveHours(), alarm.getArriveMinutes(), false);
+                dialog.setThemeDark(true);
+                dialog.show(((MainActivity) _context).getFragmentManager(), "timepicker");
+            }
+        });
+
         ((TextView) convertView.findViewById(R.id.location)).setText("at " + alarm.getPlaceName());
+
         Switch enabledSwitch = (Switch) convertView.findViewById(R.id.enabled);
         enabledSwitch.setChecked(alarm.isEnabled());
         enabledSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -127,6 +195,8 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         convertView.findViewById(R.id.delete).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                alarms.remove(alarm);
+                notifyDataSetChanged();
                 AlarmsDataSource dataSource = new AlarmsDataSource(view.getContext());
                 try {
                     dataSource.open();
@@ -136,6 +206,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                     e.printStackTrace();
                 }
                 dataSource.close();
+                updateNoAlarmStatus();
             }
         });
         return convertView;

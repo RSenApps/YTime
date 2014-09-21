@@ -17,6 +17,7 @@ import com.getpebble.android.kit.util.PebbleDictionary;
 import com.google.android.gms.location.LocationClient;
 
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -69,6 +70,7 @@ public class AlarmHelper extends BroadcastReceiver {
             PendingIntent nextWakeupIntent=null;
             Calendar nextWakeup = null;
             Calendar nextAlarmTime = null;
+            Alarm nextAlarm = null;
             for (Alarm alarm : alarms) {
                 if (alarm.isEnabled()) {
 
@@ -87,11 +89,13 @@ public class AlarmHelper extends BroadcastReceiver {
                         calendar.set(Calendar.HOUR_OF_DAY, alarm.getArriveHours());
                         calendar.set(Calendar.MINUTE, alarm.getArriveMinutes());
                         calendar.add(Calendar.MINUTE, -1 * (duration));
+                        calendar.add(Calendar.MINUTE, -1 * alarm.getGetReady());
                         alarm.setWakeupHours(calendar.get(Calendar.HOUR_OF_DAY));
                         alarm.setWakeupMinutes(calendar.get(Calendar.MINUTE));
                         dataSource.updateAlarm(alarm);
                     }
-                    calendar.add(Calendar.MINUTE, -1 * alarm.getGetReady());
+
+
                     if (calendar.before(Calendar.getInstance()))
                     {
                         calendar.add(Calendar.DATE, 1);
@@ -101,9 +105,10 @@ public class AlarmHelper extends BroadcastReceiver {
 
 
                     long minutesBeforeAlarm = (calendar.getTime().getTime() - Calendar.getInstance().getTime().getTime())/1000/60;
-                    if (nextAlarmTime == null || nextAlarmTime.after(calendar))
+                    if ((nextAlarmTime == null || nextAlarmTime.after(calendar)) && minutesBeforeAlarm > 15)
                     {
                         nextAlarmTime = calendar;
+                        nextAlarm = alarm;
                     }
                     if (minutesBeforeAlarm > 70)
                     {
@@ -134,6 +139,9 @@ public class AlarmHelper extends BroadcastReceiver {
                     }
                     else {
                         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+                        PebbleKit.startAppOnPebble(context, PEBBLE_APP_UUID);
+                        Log.d("wakeup", "Alarm rings at: " + calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE));
+
                         if (Build.VERSION.SDK_INT > 18) {
                             alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), PendingIntent.getActivity(context, 1928, new Intent(context, WakeupActivity.class), PendingIntent.FLAG_ONE_SHOT));
                         }
@@ -151,9 +159,14 @@ public class AlarmHelper extends BroadcastReceiver {
             if (nextAlarmTime != null)
             {
                 PebbleDictionary data = new PebbleDictionary();
-                data.addUint8(0, (byte) 1);
-                data.addUint8(1, (byte) nextAlarmTime.get(Calendar.HOUR_OF_DAY));
-                data.addUint8(2, (byte) nextAlarmTime.get(Calendar.MINUTE));
+                Calendar calendar = Calendar.getInstance();
+                calendar.set(Calendar.HOUR_OF_DAY, nextAlarm.getArriveHours());
+                calendar.set(Calendar.MINUTE, nextAlarm.getArriveMinutes());
+                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+                data.addInt32(0, (byte) 0);
+                data.addString(1, sdf.format(nextAlarmTime.getTime()));
+                data.addString(2, sdf.format(calendar.getTime()));
+                data.addString(3, nextAlarm.getPlaceName());
                 PebbleKit.sendDataToPebble(context, PEBBLE_APP_UUID, data);
             }
         } catch (SQLException e) {

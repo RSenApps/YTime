@@ -21,6 +21,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_WAKEUP_HOURS = "wakeuphours";
     public static final String COLUMN_WAKEUP_MINUTES = "wakeupminutes";
     public static final String COLUMN_GET_READY = "getready";
+    public static final String COLUMN_LOCATION_NAME = "location_name";
+    public static final String COLUMN_IS_ENABLED = "enabled";
 
     public static final String COLUMN_NAME = "name";
 
@@ -33,7 +35,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + " integer primary key autoincrement, " + COLUMN_IS_LOCATION
             + " integer, " + COLUMN_LAT + " real, " + COLUMN_LNG + " real, "
             + COLUMN_ARRIVE_HOURS + " integer, " + COLUMN_ARRIVE_MINUTES + " integer, " + COLUMN_WAKEUP_HOURS + " integer, "
-            + COLUMN_WAKEUP_MINUTES + " integer, " + COLUMN_GET_READY + " integer);";
+            + COLUMN_WAKEUP_MINUTES + " integer, " + COLUMN_GET_READY + " integer, " + COLUMN_LOCATION_NAME + " text, "
+            + COLUMN_IS_ENABLED + " integer);";
     private static final String DATABASE_CREATE2 = "create table " + TABLE_LOCATIONS
             + "(" + COLUMN_ID + " integer primary key autoincrement, " + COLUMN_NAME + " text, " + COLUMN_LAT + " real, "
             + COLUMN_LNG + " real);";
@@ -52,6 +55,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_ALARMS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_LOCATIONS);
+
         onCreate(db);
     }
 

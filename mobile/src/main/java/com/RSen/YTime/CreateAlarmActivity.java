@@ -51,7 +51,7 @@ public class CreateAlarmActivity extends Activity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_alarm);
         if (GoogleMapsAPI.servicesConnected(this)) {
-            startService(new Intent(this, PebbleListeningService.class));
+
 
             dataSource = new AlarmsDataSource(this);
 
@@ -100,12 +100,18 @@ public class CreateAlarmActivity extends Activity implements
                         @Override
                         public void run() {
                             dataSource.createLocationAlarm(lat, lng, hours, minutes, Integer.parseInt(getReadyInput.getText().toString()), placeName);
+                            String[] placeWords = placeName.split("\\s+");
+                            dataSource.addLocation(placeWords[0] + " " + placeWords[1] + " " + placeWords[2] + " " + placeWords[3], lat, lng);
+                            dataSource.close();
                             AlarmHelper.setAlarms(CreateAlarmActivity.this, mLocationClient);
-                            dataSource.addLocation(placeName, lat, lng);
                         }
                     });
+                    if (placeName.equals(null) || placeName.length() < 1)
+                    {
+                        Toast.makeText(CreateAlarmActivity.this, "Please enter a location...", Toast.LENGTH_LONG).show();
+                    }
                     thread.start();
-
+                    finish();
 
                 }
             });

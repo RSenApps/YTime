@@ -81,9 +81,11 @@
     <orderEntry type="jdk" jdkName="Android API 20 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="pebblekit-2.5.0" level="project" />
+    <orderEntry type="library" exported="" name="floatingactionbutton-1.0.3" level="project" />
     <orderEntry type="library" exported="" name="datetimepicker-0.1.0" level="project" />
     <orderEntry type="library" exported="" name="support-v4-19.1.0" level="project" />
     <orderEntry type="library" exported="" name="guava-14.0.1" level="project" />
+    <orderEntry type="library" exported="" name="support-annotations-20.0.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-5.0.89" level="project" />
     <orderEntry type="library" exported="" name="support-v13-19.1.0" level="project" />
   </component>

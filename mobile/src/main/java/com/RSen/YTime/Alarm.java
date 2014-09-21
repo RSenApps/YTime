@@ -13,6 +13,8 @@ public class Alarm {
     private int arriveHours = 0;
     private int arriveMinutes = 0;
     private int wakeupHours = 0;
+    private String placeName = "";
+
 
     public int getArriveHours() {
         return arriveHours;
@@ -49,30 +51,38 @@ public class Alarm {
     private int wakeupMinutes = 0;
     private int getReady = 0;
     private boolean enabled = true;
-    public Alarm(long id, double lat, double lng, int arriveHours, int arriveMinutes, int getready)
+    public Alarm(long id, double lat, double lng, int arriveHours, int arriveMinutes, int getready, String placeName)
     {
         locationBased = true;
         this.lat = lat;
         this.lng = lng;
+        this.id = id;
         this.arriveHours = arriveHours;
         this.arriveMinutes = arriveMinutes;
+        this.placeName = placeName;
+        this.getReady = getready;
     }
     public Alarm(long id, int hours, int minutes)
     {
         locationBased = false;
         this.wakeupHours = hours;
+        this.id = id;
         this.wakeupMinutes = minutes;
     }
-    public Alarm(long id, int isLocation, double lat, double lng, int arriveHours, int arriveMinutes, int wakeupHours, int wakeupMinutes, int getready)
+    public Alarm(long id, int isLocation, double lat, double lng, int arriveHours, int arriveMinutes, int wakeupHours, int wakeupMinutes, int getready, String placeName, int enabled)
     {
         locationBased = (isLocation != 0);
+        this.enabled = (enabled != 0);
+
         this.lat = lat;
         this.lng = lng;
         this.arriveHours = arriveHours;
         this.arriveMinutes = arriveMinutes;
         this.wakeupHours = wakeupHours;
         this.wakeupMinutes = wakeupMinutes;
-
+        this.placeName = placeName;
+        this.id = id;
+        this.getReady = getready;
     }
     public long getId()
     {
@@ -119,5 +129,11 @@ public class Alarm {
     public void setEnabled (boolean enabled) {this.enabled = enabled;}
 
 
+    public String getPlaceName() {
+        return placeName;
+    }
 
+    public void setPlaceName(String placeName) {
+        this.placeName = placeName;
+    }
 }
