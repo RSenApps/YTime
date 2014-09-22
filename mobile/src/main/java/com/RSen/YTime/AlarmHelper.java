@@ -105,7 +105,7 @@ public class AlarmHelper extends BroadcastReceiver {
 
 
                     long minutesBeforeAlarm = (calendar.getTime().getTime() - Calendar.getInstance().getTime().getTime())/1000/60;
-                    if ((nextAlarmTime == null || nextAlarmTime.after(calendar)) && minutesBeforeAlarm > 15)
+                    if ((nextAlarmTime == null || nextAlarmTime.after(calendar)))
                     {
                         nextAlarmTime = calendar;
                         nextAlarm = alarm;

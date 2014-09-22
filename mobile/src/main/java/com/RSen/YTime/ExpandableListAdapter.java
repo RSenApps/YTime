@@ -153,7 +153,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                     @Override
                     public void onTimeSet(RadialPickerLayout radialPickerLayout, int i, int i2) {
                         alarm.setArriveHours(i);
-                        alarm.setArriveMinutes(i);
+                        alarm.setArriveMinutes(i2);
+                        alarm.setWakeupHours(0);
+                        alarm.setWakeupMinutes(0);
                         notifyDataSetChanged();
                         AlarmsDataSource dataSource = new AlarmsDataSource(radialPickerLayout.getContext());
                         try {

@@ -15,10 +15,7 @@ import com.getpebble.android.kit.util.PebbleDictionary;
 
 
 public class WakeupActivity extends Activity {
-    @Override
-    public void onBackPressed() {
 
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -3,12 +3,26 @@ package com.RSen.YTime;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
+import android.location.Location;
+import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
+import android.widget.Toast;
 
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.sql.SQLException;
 import java.text.ParseException;
@@ -19,7 +33,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-public class PebbleListeningService extends Service {
+public class PebbleListeningService extends Service implements
+        GooglePlayServicesClient.ConnectionCallbacks,
+        GooglePlayServicesClient.OnConnectionFailedListener {
     public PebbleListeningService() {
     }
 
@@ -30,9 +46,11 @@ public class PebbleListeningService extends Service {
     }
     final Queue<String> messageQueue = new LinkedList<String>();
     protected int queueSize;
+    LocationClient mLocationClient;
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
+        mLocationClient = new LocationClient(this, this, this);
+        mLocationClient.connect();
         PebbleKit.registerReceivedAckHandler(getApplicationContext(), new PebbleKit.PebbleAckReceiver(AlarmHelper.PEBBLE_APP_UUID) {
             @Override
             public void receiveAck(Context context, int transactionId) {
@@ -86,22 +104,30 @@ public class PebbleListeningService extends Service {
                 }
                 else if (data.getInteger(0) == 0)
                 {
-                    AlarmsDataSource dataSource = new AlarmsDataSource(PebbleListeningService.this);
-                    try {
-                        dataSource.open();
-                        LatLng location = dataSource.getLocationByName(data.getString(3));
-                        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
-                        Date arrival = null;
-                        try {
-                             arrival = sdf.parse(data.getString(2));
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                        dataSource.createLocationAlarm(location.latitude, location.longitude, arrival.getHours(), arrival.getMinutes(), 0, data.getString(3));
-                        AlarmHelper.setAlarms(PebbleListeningService.this, null);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
+
+                        Thread thread = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try {
+                                    AlarmsDataSource dataSource = new AlarmsDataSource(PebbleListeningService.this);
+                                    dataSource.open();
+                                    LatLng location = dataSource.getLocationByName(data.getString(3));
+                                    SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+                                    Date arrival = null;
+                                    try {
+                                        arrival = sdf.parse(data.getString(2));
+                                    } catch (ParseException e) {
+                                        e.printStackTrace();
+                                    }
+                                dataSource.createLocationAlarm(location.latitude, location.longitude, arrival.getHours(), arrival.getMinutes(), 0, data.getString(3));
+                                AlarmHelper.setAlarms(PebbleListeningService.this, mLocationClient);
+
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                            }
+                        }});
+                         thread.start();
+
 
                 }
                 //key is 0, value is 0
@@ -111,5 +137,42 @@ public class PebbleListeningService extends Service {
             }
         });
         return super.onStartCommand(intent, flags, startId);
+    }
+    @Override
+    public void onDestroy() {
+        // Disconnecting the client invalidates it.
+        mLocationClient.disconnect();
+    }
+    @Override
+    public void onConnected(Bundle dataBundle) {
+    }
+    /*
+     * Called by Location Services if the connection to the
+     * location client drops because of an error.
+     */
+    @Override
+    public void onDisconnected() {
+    }
+    /*
+     * Called by Location Services if the attempt to
+     * Location Services fails.
+     */
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        /*
+         * Google Play services can resolve some errors it detects.
+         * If the error has a resolution, try sending an Intent to
+         * start a Google Play services activity that can resolve
+         * error.
+         */
+        if (connectionResult.hasResolution()) {
+
+        } else {
+            /*
+             * If no resolution is available, display a dialog to the
+             * user with the error.
+             */
+            Toast.makeText(this, connectionResult.getErrorCode(), Toast.LENGTH_LONG).show();
+        }
     }
 }
