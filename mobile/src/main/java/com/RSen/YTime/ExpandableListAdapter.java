@@ -92,7 +92,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             public void onClick(View view) {
                 Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
                 intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
-                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Tone");
+                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Alarm");
                 intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
                 ((Activity) _context).startActivityForResult(intent, groupPosition);
             }

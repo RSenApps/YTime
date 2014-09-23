@@ -32,6 +32,9 @@ public class AlarmHelper extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        if (PebbleKit.isWatchConnected(context)) {
+            context.startService(new Intent(context, PebbleListeningService.class));
+        }
         setAlarms(context, null);
     }
 
@@ -42,13 +45,26 @@ public class AlarmHelper extends BroadcastReceiver {
             dataSource.open();
             Alarm alarm = dataSource.getAlarmById(id);
 
+
+            Calendar calendar = Calendar.getInstance();
             Location location = locationClient.getLastLocation();
-            int duration = BingMapsAPI.getTimeToLocation(location.getLatitude(), location.getLongitude(), alarm.getLat(), alarm.getLng(), alarm.getArriveHours(), alarm.getArriveMinutes(), BingMapsAPI.TRANSIT_MODE.driving, true);
-            Toast.makeText(context, "New duration:" + duration, Toast.LENGTH_LONG).show();
-            int arriveMinutes = alarm.getArriveHours() * 60 + alarm.getArriveMinutes();
-            arriveMinutes -= duration + alarm.getGetReady();
-            alarm.setWakeupHours(arriveMinutes / 60);
-            alarm.setWakeupMinutes(arriveMinutes % 60);
+            int duration = BingMapsAPI.getTimeToLocation(location.getLatitude(), location.getLongitude(), alarm.getLat(), alarm.getLng(), alarm.getArriveHours(), alarm.getWakeupMinutes(), BingMapsAPI.TRANSIT_MODE.driving, true);
+
+            calendar.set(Calendar.HOUR_OF_DAY, alarm.getArriveHours());
+            calendar.set(Calendar.MINUTE, alarm.getArriveMinutes());
+            calendar.add(Calendar.MINUTE, -1 * (duration));
+            calendar.add(Calendar.MINUTE, -1 * alarm.getGetReady());
+            if (calendar.before(Calendar.getInstance()))
+            {
+                if ( Calendar.getInstance().getTime().getTime() - calendar.getTime().getTime() < 30) {
+                    //ring now
+                    calendar = Calendar.getInstance();
+                    calendar.add(Calendar.SECOND, 3);
+                }
+                //don't add another day as we are just updating the hour and day
+            }
+            alarm.setWakeupHours(calendar.get(Calendar.HOUR_OF_DAY));
+            alarm.setWakeupMinutes(calendar.get(Calendar.MINUTE));
             dataSource.updateAlarm(alarm);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -73,11 +89,7 @@ public class AlarmHelper extends BroadcastReceiver {
             Alarm nextAlarm = null;
             for (Alarm alarm : alarms) {
                 if (alarm.isEnabled()) {
-
-
-
                     Calendar calendar = Calendar.getInstance();
-
                     calendar.set(Calendar.HOUR_OF_DAY, alarm.getWakeupHours());
                     calendar.set(Calendar.MINUTE, alarm.getWakeupMinutes());
                     calendar.set(Calendar.SECOND, 0);
@@ -94,16 +106,10 @@ public class AlarmHelper extends BroadcastReceiver {
                         alarm.setWakeupMinutes(calendar.get(Calendar.MINUTE));
                         dataSource.updateAlarm(alarm);
                     }
-
-
                     if (calendar.before(Calendar.getInstance()))
                     {
                         calendar.add(Calendar.DATE, 1);
                     }
-
-
-
-
                     long minutesBeforeAlarm = (calendar.getTime().getTime() - Calendar.getInstance().getTime().getTime())/1000/60;
                     if ((nextAlarmTime == null || nextAlarmTime.after(calendar)))
                     {
@@ -153,6 +159,10 @@ public class AlarmHelper extends BroadcastReceiver {
                 }
             }
             if (nextWakeup != null && nextWakeupIntent != null) {
+                if (nextWakeup.before(Calendar.getInstance()))
+                {
+                    nextWakeup.add(Calendar.DATE, 1);
+                }
                 Log.d("wakeup", "Next wakeup set to: " + nextWakeup.get(Calendar.HOUR_OF_DAY) + ":" + nextWakeup.get(Calendar.MINUTE));
                 setAlarm(context, nextWakeup, nextWakeupIntent);
             }

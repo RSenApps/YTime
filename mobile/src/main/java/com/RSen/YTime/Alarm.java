@@ -15,6 +15,25 @@ public class Alarm {
     private int wakeupHours = 0;
     private String placeName = "";
 
+    public String getRingtoneURI() {
+        return ringtoneURI;
+    }
+
+    public void setRingtoneURI(String ringtoneURI) {
+        this.ringtoneURI = ringtoneURI;
+    }
+
+    public String getRingtoneName() {
+        return ringtoneName;
+    }
+
+    public void setRingtoneName(String ringtoneName) {
+        this.ringtoneName = ringtoneName;
+    }
+
+    private String ringtoneURI = "";
+    private String ringtoneName = "";
+
 
     public int getArriveHours() {
         return arriveHours;

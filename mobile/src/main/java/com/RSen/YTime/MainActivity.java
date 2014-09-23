@@ -14,6 +14,7 @@ import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.getpebble.android.kit.PebbleKit;
 import com.melnykov.fab.FloatingActionButton;
 
 import java.sql.SQLException;
@@ -29,8 +30,9 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        startService(new Intent(this, PebbleListeningService.class));
+        if (PebbleKit.isWatchConnected(this)) {
+            startService(new Intent(this, PebbleListeningService.class));
+        }
         expListView = (ExpandableListView) findViewById(R.id.expandableListView);
         FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.add);
         floatingActionButton.attachToListView(expListView);

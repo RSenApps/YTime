@@ -23,6 +23,10 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_GET_READY = "getready";
     public static final String COLUMN_LOCATION_NAME = "location_name";
     public static final String COLUMN_IS_ENABLED = "enabled";
+    public static final String COLUMN_RINGTONE_URI = "ringtoneuri";
+    public static final String COLUMN_RINGTONE_NAME = "ringtonename";
+
+
 
     public static final String COLUMN_NAME = "name";
 
@@ -36,7 +40,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
             + " integer, " + COLUMN_LAT + " real, " + COLUMN_LNG + " real, "
             + COLUMN_ARRIVE_HOURS + " integer, " + COLUMN_ARRIVE_MINUTES + " integer, " + COLUMN_WAKEUP_HOURS + " integer, "
             + COLUMN_WAKEUP_MINUTES + " integer, " + COLUMN_GET_READY + " integer, " + COLUMN_LOCATION_NAME + " text, "
-            + COLUMN_IS_ENABLED + " integer);";
+            + COLUMN_IS_ENABLED + " integer, " + COLUMN_RINGTONE_URI + " text, " + COLUMN_RINGTONE_NAME + " text);";
     private static final String DATABASE_CREATE2 = "create table " + TABLE_LOCATIONS
             + "(" + COLUMN_ID + " integer primary key autoincrement, " + COLUMN_NAME + " text, " + COLUMN_LAT + " real, "
             + COLUMN_LNG + " real);";
