@@ -4,6 +4,9 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -19,7 +22,9 @@ public class AlarmsDataSource {
     private MySQLiteHelper dbHelper;
     private String[] allColumns = { MySQLiteHelper.COLUMN_ID,
             MySQLiteHelper.COLUMN_IS_LOCATION, MySQLiteHelper.COLUMN_LAT, MySQLiteHelper.COLUMN_LNG,
-            MySQLiteHelper.COLUMN_ARRIVE_HOURS, MySQLiteHelper.COLUMN_ARRIVE_MINUTES,MySQLiteHelper.COLUMN_WAKEUP_HOURS, MySQLiteHelper.COLUMN_WAKEUP_MINUTES, MySQLiteHelper.COLUMN_GET_READY, MySQLiteHelper.COLUMN_LOCATION_NAME, MySQLiteHelper.COLUMN_IS_ENABLED};
+            MySQLiteHelper.COLUMN_ARRIVE_HOURS, MySQLiteHelper.COLUMN_ARRIVE_MINUTES,MySQLiteHelper.COLUMN_WAKEUP_HOURS,
+            MySQLiteHelper.COLUMN_WAKEUP_MINUTES, MySQLiteHelper.COLUMN_GET_READY, MySQLiteHelper.COLUMN_LOCATION_NAME,
+            MySQLiteHelper.COLUMN_IS_ENABLED, MySQLiteHelper.COLUMN_RINGTONE_URI, MySQLiteHelper.COLUMN_RINGTONE_NAME};
 
     public AlarmsDataSource(Context context) {
         dbHelper = new MySQLiteHelper(context);
@@ -33,7 +38,7 @@ public class AlarmsDataSource {
         dbHelper.close();
     }
 
-    public Alarm createLocationAlarm(double lat, double lng, int arriveHours, int arriveMinutes, int getReady, String placeName) {
+    public Alarm createLocationAlarm(Context context, double lat, double lng, int arriveHours, int arriveMinutes, int getReady, String placeName) {
         ContentValues values = new ContentValues();
         values.put(MySQLiteHelper.COLUMN_IS_LOCATION, 1);
         values.put(MySQLiteHelper.COLUMN_LAT, lat);
@@ -43,7 +48,10 @@ public class AlarmsDataSource {
         values.put(MySQLiteHelper.COLUMN_GET_READY, getReady);
         values.put(MySQLiteHelper.COLUMN_LOCATION_NAME, placeName);
         values.put(MySQLiteHelper.COLUMN_IS_ENABLED, true);
-
+        Uri defaultAlarm = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+        String defaultAlarmTitle = RingtoneManager.getRingtone(context,  defaultAlarm).getTitle(context);
+        values.put(MySQLiteHelper.COLUMN_RINGTONE_URI, defaultAlarm.toString());
+        values.put(MySQLiteHelper.COLUMN_RINGTONE_NAME, defaultAlarmTitle);
         long insertId = database.insert(MySQLiteHelper.TABLE_ALARMS, null,
                 values);
         Cursor cursor = database.query(MySQLiteHelper.TABLE_ALARMS,
@@ -74,6 +82,9 @@ public class AlarmsDataSource {
         values.put(MySQLiteHelper.COLUMN_WAKEUP_MINUTES, alarm.getWakeupMinutes());
         values.put(MySQLiteHelper.COLUMN_LOCATION_NAME, alarm.getPlaceName());
         values.put(MySQLiteHelper.COLUMN_IS_ENABLED, alarm.isEnabled());
+        values.put(MySQLiteHelper.COLUMN_RINGTONE_URI, alarm.getRingtoneURI());
+        values.put(MySQLiteHelper.COLUMN_RINGTONE_NAME, alarm.getRingtoneName());
+
 
         database.update(MySQLiteHelper.TABLE_ALARMS, values,  MySQLiteHelper.COLUMN_ID
                 + " = " + alarm.getId(), null);
@@ -111,7 +122,8 @@ public class AlarmsDataSource {
 
     private Alarm cursorToAlarm(Cursor cursor) {
         Alarm alarm = new Alarm(cursor.getLong(0), cursor.getInt(1), cursor.getDouble(2),
-                cursor.getDouble(3), cursor.getInt(4), cursor.getInt(5), cursor.getInt(6), cursor.getInt(7), cursor.getInt(8), cursor.getString(9), cursor.getInt(10));
+                cursor.getDouble(3), cursor.getInt(4), cursor.getInt(5), cursor.getInt(6), cursor.getInt(7), cursor.getInt(8), cursor.getString(9), cursor.getInt(10),
+                cursor.getString(11), cursor.getString(12));
         return alarm;
     }
     public void addLocation (String name, double lat, double lng) {

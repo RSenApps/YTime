@@ -38,10 +38,12 @@ public class WakeupActivity extends Activity {
         data.addUint8(0, (byte) 2);
         PebbleKit.sendDataToPebble(this, AlarmHelper.PEBBLE_APP_UUID, data);
 
-
-
+        long id = getIntent().getLongExtra("alarmid", -1);
+        AlarmsDataSource dataSource = new AlarmsDataSource(this);
+        Alarm alarm = dataSource.getAlarmById(id);
+        dataSource.close();
         try {
-            Uri alert =  RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+            Uri alert =  Uri.parse(alarm.getRingtoneURI()); //if null goes to catch
             mMediaPlayer = new MediaPlayer();
             mMediaPlayer.setDataSource(this, alert);
             final AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -51,6 +53,7 @@ public class WakeupActivity extends Activity {
                 mMediaPlayer.prepare();
                 mMediaPlayer.start();
             }
+
         } catch(Exception e) {
         }
 

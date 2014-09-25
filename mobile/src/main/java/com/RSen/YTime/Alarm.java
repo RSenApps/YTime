@@ -88,7 +88,7 @@ public class Alarm {
         this.id = id;
         this.wakeupMinutes = minutes;
     }
-    public Alarm(long id, int isLocation, double lat, double lng, int arriveHours, int arriveMinutes, int wakeupHours, int wakeupMinutes, int getready, String placeName, int enabled)
+    public Alarm(long id, int isLocation, double lat, double lng, int arriveHours, int arriveMinutes, int wakeupHours, int wakeupMinutes, int getready, String placeName, int enabled, String ringtoneURI, String ringtoneName)
     {
         locationBased = (isLocation != 0);
         this.enabled = (enabled != 0);
@@ -102,6 +102,8 @@ public class Alarm {
         this.placeName = placeName;
         this.id = id;
         this.getReady = getready;
+        this.ringtoneURI = ringtoneURI;
+        this.ringtoneName = ringtoneName;
     }
     public long getId()
     {

@@ -2,25 +2,12 @@ package com.RSen.YTime;
 
 import android.app.Service;
 import android.content.Intent;
-import android.content.IntentSender;
-import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AutoCompleteTextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-
-import java.util.UUID;
 
 /**
  * Created by Ryan on 9/20/2014.
@@ -64,7 +51,7 @@ public class AlarmService extends Service implements
     }
     @Override
     public void onConnected(Bundle dataBundle) {
-        AlarmHelper.updateAlarm(this, id, mLocationClient);
+        AlarmHelper.updateAlarmTime(this, id, mLocationClient);
         AlarmHelper.setAlarms(this, mLocationClient);
         stopSelf();
 

@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -37,8 +38,19 @@ public class AlarmHelper extends BroadcastReceiver {
         }
         setAlarms(context, null);
     }
-
-    public static void updateAlarm (Context context, long id, LocationClient locationClient)
+    public static void updateAlarm(Context context, Alarm alarm)
+    {
+        AlarmsDataSource dataSource = new AlarmsDataSource(context);
+        try {
+            dataSource.open();
+            dataSource.updateAlarm(alarm);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        dataSource.close();
+        LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent("update"));
+    }
+    public static void updateAlarmTime(Context context, long id, LocationClient locationClient)
     {
         AlarmsDataSource dataSource = new AlarmsDataSource(context);
         try {
@@ -70,6 +82,7 @@ public class AlarmHelper extends BroadcastReceiver {
             e.printStackTrace();
         }
        dataSource.close();
+        LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent("update"));
     }
     private static void setAlarm(Context context, Calendar calendar, PendingIntent pIntent) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
@@ -147,12 +160,12 @@ public class AlarmHelper extends BroadcastReceiver {
                         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
                         PebbleKit.startAppOnPebble(context, PEBBLE_APP_UUID);
                         Log.d("wakeup", "Alarm rings at: " + calendar.get(Calendar.HOUR_OF_DAY) + ":" + calendar.get(Calendar.MINUTE));
-
+                        PendingIntent intent = PendingIntent.getActivity(context, 1928, new Intent(context, WakeupActivity.class).putExtra("alarmid", alarm.getId()), PendingIntent.FLAG_ONE_SHOT);
                         if (Build.VERSION.SDK_INT > 18) {
-                            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), PendingIntent.getActivity(context, 1928, new Intent(context, WakeupActivity.class), PendingIntent.FLAG_ONE_SHOT));
+                            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), intent);
                         }
                         else {
-                            alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), PendingIntent.getActivity(context, 1928, new Intent(context, WakeupActivity.class), PendingIntent.FLAG_ONE_SHOT));
+                            alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), intent);
 
                         }
                     }
@@ -183,6 +196,7 @@ public class AlarmHelper extends BroadcastReceiver {
             e.printStackTrace();
         }
         dataSource.close();
+        LocalBroadcastManager.getInstance(context).sendBroadcast(new Intent("update"));
     }
     private static PendingIntent createPendingIntent(Context context, Alarm alarm) {
         Intent intent = new Intent(context, AlarmService.class);

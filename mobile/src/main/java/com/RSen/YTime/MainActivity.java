@@ -1,12 +1,16 @@
 package com.RSen.YTime;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.Image;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +30,21 @@ import java.util.List;
 public class MainActivity extends Activity {
     ExpandableListAdapter listAdapter;
     ExpandableListView expListView;
+    private BroadcastReceiver updateReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            AlarmsDataSource dataSource = new AlarmsDataSource(context);
+            try {
+                dataSource.open();
+
+                listAdapter.alarms = dataSource.getAllAlarms();
+                listAdapter.notifyDataSetChanged();
+            } catch (Exception e) {
+            }
+            dataSource.close();
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,6 +65,7 @@ public class MainActivity extends Activity {
         findViewById(R.id.add).setOnClickListener(addClickListener);
         findViewById(R.id.noalarms).setOnClickListener(addClickListener);
         findViewById(R.id.noalarmsText).setOnClickListener(addClickListener);
+
 
     }
 
@@ -69,8 +89,7 @@ public class MainActivity extends Activity {
                 expListView.expandGroup(0);
                 findViewById(R.id.noalarms).setVisibility(View.GONE);
                 findViewById(R.id.noalarmsText).setVisibility(View.GONE);
-            }
-            else {
+            } else {
                 findViewById(R.id.noalarms).setVisibility(View.VISIBLE);
                 findViewById(R.id.noalarmsText).setVisibility(View.VISIBLE);
             }
@@ -78,6 +97,30 @@ public class MainActivity extends Activity {
             e.printStackTrace();
         }
         dataSource.close();
+        LocalBroadcastManager.getInstance(this).registerReceiver(updateReceiver,
+                new IntentFilter("update"));
+    }
+
+    @Override
+    protected void onPause() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(updateReceiver);
+        super.onPause();
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent Mringtone) {
+        if (resultCode == RESULT_OK) {
+            Uri uri = Mringtone.getParcelableExtra(RingtoneManager.EXTRA_RINGTONE_PICKED_URI);
+            Alarm alarm = listAdapter.getGroup(requestCode);
+            if (uri == null) {
+                alarm.setRingtoneURI(null);
+                alarm.setRingtoneName("Silent");
+            }
+            else {
+                alarm.setRingtoneURI(uri.toString());
+                alarm.setRingtoneName(RingtoneManager.getRingtone(this, uri).getTitle(this));
+            }
+            AlarmHelper.updateAlarm(this, alarm);
+        }
 
     }
 }

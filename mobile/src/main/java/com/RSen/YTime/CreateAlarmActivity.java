@@ -99,7 +99,7 @@ public class CreateAlarmActivity extends Activity implements
                     Thread thread = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            dataSource.createLocationAlarm(lat, lng, hours, minutes, Integer.parseInt(getReadyInput.getText().toString()), placeName);
+                            dataSource.createLocationAlarm(CreateAlarmActivity.this, lat, lng, hours, minutes, Integer.parseInt(getReadyInput.getText().toString()), placeName);
                             String[] placeWords = placeName.split("\\s+");
                             dataSource.addLocation(placeWords[0] + " " + placeWords[1] + " " + placeWords[2] + " " + placeWords[3], lat, lng);
                             dataSource.close();

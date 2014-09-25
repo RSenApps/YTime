@@ -119,7 +119,7 @@ public class PebbleListeningService extends Service implements
                                     } catch (ParseException e) {
                                         e.printStackTrace();
                                     }
-                                dataSource.createLocationAlarm(location.latitude, location.longitude, arrival.getHours(), arrival.getMinutes(), 0, data.getString(3));
+                                dataSource.createLocationAlarm(PebbleListeningService.this, location.latitude, location.longitude, arrival.getHours(), arrival.getMinutes(), 0, data.getString(3));
                                 AlarmHelper.setAlarms(PebbleListeningService.this, mLocationClient);
 
                             } catch (SQLException e) {

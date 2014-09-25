@@ -53,7 +53,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         }
     }
     @Override
-    public Object getChild(int groupPosition, int childPosititon) {
+    public Alarm getChild(int groupPosition, int childPosititon) {
         return alarms.get(groupPosition);
     }
 
@@ -87,13 +87,14 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
                 }
             }
         });
+        ((TextView) convertView.findViewById(R.id.ringtone)).setText(alarm.getRingtoneName());
         convertView.findViewById(R.id.ringtone).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(RingtoneManager.ACTION_RINGTONE_PICKER);
-                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_NOTIFICATION);
+                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM);
                 intent.putExtra(RingtoneManager.EXTRA_RINGTONE_TITLE, "Select Alarm");
-                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, (Uri) null);
+                intent.putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, Uri.parse(alarm.getRingtoneURI()));
                 ((Activity) _context).startActivityForResult(intent, groupPosition);
             }
         });
@@ -106,7 +107,7 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
     }
 
     @Override
-    public Object getGroup(int groupPosition) {
+    public Alarm getGroup(int groupPosition) {
         return alarms.get(groupPosition);
     }
 
