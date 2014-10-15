@@ -27,7 +27,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_RINGTONE_NAME = "ringtonename";
 
 
-
     public static final String COLUMN_NAME = "name";
 
     private static final String DATABASE_NAME = "alarms.db";

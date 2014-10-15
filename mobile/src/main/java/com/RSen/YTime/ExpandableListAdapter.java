@@ -3,17 +3,10 @@ package com.RSen.YTime;
 /**
  * Created by Ryan on 9/20/2014.
  */
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.view.LayoutInflater;
@@ -29,29 +22,35 @@ import android.widget.TextView;
 import com.android.datetimepicker.time.RadialPickerLayout;
 import com.android.datetimepicker.time.TimePickerDialog;
 
+import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.List;
+
 public class ExpandableListAdapter extends BaseExpandableListAdapter {
 
     private Context _context;
     public List<Alarm> alarms;
     ImageView noAlarmImage;
     TextView noAlarmText;
+
     public ExpandableListAdapter(Context context, List<Alarm> alarms, ImageView noAlarmImage, TextView noAlarmText) {
         this._context = context;
         this.alarms = alarms;
         this.noAlarmImage = noAlarmImage;
         this.noAlarmText = noAlarmText;
     }
-    private void updateNoAlarmStatus()
-    {
+
+    private void updateNoAlarmStatus() {
         if (alarms != null && alarms.size() > 0) {
             noAlarmImage.setVisibility(View.GONE);
             noAlarmText.setVisibility(View.GONE);
-        }
-        else {
+        } else {
             noAlarmImage.setVisibility(View.VISIBLE);
             noAlarmText.setVisibility(View.VISIBLE);
         }
     }
+
     @Override
     public Alarm getChild(int groupPosition, int childPosititon) {
         return alarms.get(groupPosition);
@@ -78,10 +77,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         ((CheckBox) convertView.findViewById(R.id.repeat)).setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if(b) {
+                if (b) {
                     view.findViewById(R.id.repeatButtons).setVisibility(View.VISIBLE);
-                }
-                else {
+                } else {
                     view.findViewById(R.id.repeatButtons).setVisibility(View.GONE);
 
                 }
@@ -135,11 +133,9 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
         alarmTime.set(Calendar.MINUTE, alarm.getArriveMinutes());
         SimpleDateFormat sdf = new SimpleDateFormat("h:mm a");
         String wakeupTimeString;
-        if (alarm.getWakeupHours() + alarm.getWakeupMinutes() == 0)
-        {
+        if (alarm.getWakeupHours() + alarm.getWakeupMinutes() == 0) {
             wakeupTimeString = " (calculating...)";
-        }
-        else {
+        } else {
             Calendar wakeupTime = Calendar.getInstance();
             wakeupTime.set(Calendar.HOUR_OF_DAY, alarm.getWakeupHours());
             wakeupTime.set(Calendar.MINUTE, alarm.getWakeupMinutes());
@@ -182,16 +178,16 @@ public class ExpandableListAdapter extends BaseExpandableListAdapter {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 
-                    alarm.setEnabled(b);
-                    AlarmsDataSource dataSource = new AlarmsDataSource(compoundButton.getContext());
-                    try {
-                        dataSource.open();
-                        dataSource.updateAlarm(alarm);
-                        AlarmHelper.setAlarms(compoundButton.getContext(), null);
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
-                   dataSource.close();
+                alarm.setEnabled(b);
+                AlarmsDataSource dataSource = new AlarmsDataSource(compoundButton.getContext());
+                try {
+                    dataSource.open();
+                    dataSource.updateAlarm(alarm);
+                    AlarmHelper.setAlarms(compoundButton.getContext(), null);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+                dataSource.close();
 
             }
         });

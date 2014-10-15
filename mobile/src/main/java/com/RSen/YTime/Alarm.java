@@ -1,7 +1,5 @@
 package com.RSen.YTime;
 
-import java.util.Calendar;
-
 /**
  * Created by Ryan on 9/20/2014.
  */
@@ -70,8 +68,8 @@ public class Alarm {
     private int wakeupMinutes = 0;
     private int getReady = 0;
     private boolean enabled = true;
-    public Alarm(long id, double lat, double lng, int arriveHours, int arriveMinutes, int getready, String placeName)
-    {
+
+    public Alarm(long id, double lat, double lng, int arriveHours, int arriveMinutes, int getready, String placeName) {
         locationBased = true;
         this.lat = lat;
         this.lng = lng;
@@ -81,15 +79,15 @@ public class Alarm {
         this.placeName = placeName;
         this.getReady = getready;
     }
-    public Alarm(long id, int hours, int minutes)
-    {
+
+    public Alarm(long id, int hours, int minutes) {
         locationBased = false;
         this.wakeupHours = hours;
         this.id = id;
         this.wakeupMinutes = minutes;
     }
-    public Alarm(long id, int isLocation, double lat, double lng, int arriveHours, int arriveMinutes, int wakeupHours, int wakeupMinutes, int getready, String placeName, int enabled, String ringtoneURI, String ringtoneName)
-    {
+
+    public Alarm(long id, int isLocation, double lat, double lng, int arriveHours, int arriveMinutes, int wakeupHours, int wakeupMinutes, int getready, String placeName, int enabled, String ringtoneURI, String ringtoneName) {
         locationBased = (isLocation != 0);
         this.enabled = (enabled != 0);
 
@@ -105,14 +103,15 @@ public class Alarm {
         this.ringtoneURI = ringtoneURI;
         this.ringtoneName = ringtoneName;
     }
-    public long getId()
-    {
+
+    public long getId() {
         return id;
     }
-    public void setId(int id)
-    {
+
+    public void setId(int id) {
         this.id = id;
     }
+
     public boolean isLocationBased() {
         return locationBased;
     }
@@ -138,16 +137,21 @@ public class Alarm {
     }
 
 
-    public int getGetReady()
-    {
+    public int getGetReady() {
         return getReady;
     }
-    public void setGetReady (int getReady)
-    {
+
+    public void setGetReady(int getReady) {
         this.getReady = getReady;
     }
-    public boolean isEnabled () {return enabled;}
-    public void setEnabled (boolean enabled) {this.enabled = enabled;}
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
 
     public String getPlaceName() {

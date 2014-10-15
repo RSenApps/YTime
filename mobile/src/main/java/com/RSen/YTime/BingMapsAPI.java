@@ -1,27 +1,13 @@
 package com.RSen.YTime;
 
-import android.app.Activity;
-import android.app.Dialog;
-import android.content.Context;
-import android.location.Location;
-
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.location.LocationClient;
-import com.google.android.gms.maps.model.LatLng;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Locale;
-import java.util.SimpleTimeZone;
 
 /**
  * Created by Ryan on 9/20/2014.
@@ -32,9 +18,10 @@ public class BingMapsAPI {
     private static final String MODE_DRIVING = "/Driving";
 
     private static final String API_KEY = "AmXC0roDXBSoAn6AUz9ScsUWbYrvoqCvjerGZ-Q4O1KxFfea9AHCi3cZ8Prl5aIM";
+
     public enum TRANSIT_MODE {driving, transit, walking}
-    public static int getTimeToLocation(double currentlat, double currentLng, double lat, double lng, int arrivalHours, int arrivalMinutes, TRANSIT_MODE mode, boolean useTraffic)
-    {
+
+    public static int getTimeToLocation(double currentlat, double currentLng, double lat, double lng, int arrivalHours, int arrivalMinutes, TRANSIT_MODE mode, boolean useTraffic) {
         HttpURLConnection conn = null;
         StringBuilder jsonResults = new StringBuilder();
         try {
@@ -43,8 +30,7 @@ public class BingMapsAPI {
             sb.append("&key=" + API_KEY);
             sb.append("&wp.0=" + currentlat + "," + currentLng);
             sb.append("&wp.1=" + lat + "," + lng);
-            if (useTraffic)
-            {
+            if (useTraffic) {
                 sb.append("&optmz=timeWithTraffic");
             }
             Calendar calendar = Calendar.getInstance();
@@ -55,12 +41,9 @@ public class BingMapsAPI {
             sb.append("&dt=" + sdf.format(calendar.getTime()));
             sb.append("&tt=Arrival");
             sb.append("&rpo=none");
-            if (mode.equals(TRANSIT_MODE.walking))
-            {
+            if (mode.equals(TRANSIT_MODE.walking)) {
                 sb.append("travelMode=Walking");
-            }
-            else if (mode.equals(TRANSIT_MODE.transit))
-            {
+            } else if (mode.equals(TRANSIT_MODE.transit)) {
                 sb.append("travelMode=Transit");
             }
             URL url = new URL(sb.toString());
@@ -86,28 +69,21 @@ public class BingMapsAPI {
             JSONObject jsonObj = new JSONObject(jsonResults.toString());
             JSONObject resourceObj = jsonObj.getJSONArray("resourceSets").getJSONObject(0).getJSONArray("resources").getJSONObject(0);
             int duration;
-            if (useTraffic)
-            {
+            if (useTraffic) {
                 duration = resourceObj.getInt("travelDurationTraffic");
-            }
-            else {
+            } else {
                 duration = resourceObj.getInt("travelDuration");
             }
             String durationUnit = resourceObj.getString("durationUnit");
             float divider = 1;
-            if (durationUnit.equals("Second"))
-            {
+            if (durationUnit.equals("Second")) {
                 divider = 60;
+            } else if (durationUnit.equals("Hour")) {
+                divider = 1 / 60;
+            } else if (durationUnit.equals("Day")) {
+                divider = 1 / 60 / 24;
             }
-            else if (durationUnit.equals("Hour"))
-            {
-                divider = 1/60;
-            }
-            else if (durationUnit.equals("Day"))
-            {
-                divider = 1/60/24;
-            }
-           return (int) Math.round((double) duration / divider);
+            return (int) Math.round((double) duration / divider);
 
         } catch (JSONException e) {
             e.printStackTrace();

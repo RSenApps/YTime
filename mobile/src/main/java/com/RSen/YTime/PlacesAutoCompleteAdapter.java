@@ -28,8 +28,8 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements F
     public String getItem(int index) {
         return resultList[index][0];
     }
-    public String getPlaceID (int index)
-    {
+
+    public String getPlaceID(int index) {
         return resultList[index][1];
     }
 
@@ -54,11 +54,11 @@ public class PlacesAutoCompleteAdapter extends ArrayAdapter<String> implements F
             protected void publishResults(CharSequence constraint, FilterResults results) {
                 if (results != null && results.count > 0) {
                     notifyDataSetChanged();
-                }
-                else {
+                } else {
                     notifyDataSetInvalidated();
                 }
-            }};
+            }
+        };
         return filter;
     }
 }

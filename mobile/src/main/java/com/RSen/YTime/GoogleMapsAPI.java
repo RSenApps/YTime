@@ -1,13 +1,10 @@
 package com.RSen.YTime;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Context;
 import android.location.Location;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.ErrorDialogFragment;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.maps.model.LatLng;
@@ -20,8 +17,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by Ryan on 9/20/2014.
@@ -34,8 +29,8 @@ public class GoogleMapsAPI {
     private static final String OUT_JSON = "/json";
 
     private static final String API_KEY = "AIzaSyCeUTV4w2KX5qQlzVFwCpUggTvNoYQl_n8";
-    public static LatLng getLocationForPlace(String placeid)
-    {
+
+    public static LatLng getLocationForPlace(String placeid) {
         LatLng resultLocation = null;
         HttpURLConnection conn = null;
         StringBuilder jsonResults = new StringBuilder();
@@ -70,14 +65,15 @@ public class GoogleMapsAPI {
             JSONObject geometryObj = resultObj.getJSONObject("geometry");
             JSONObject locationObj = geometryObj.getJSONObject("location");
 
-           resultLocation = new LatLng(locationObj.getDouble("lat"), locationObj.getDouble("lng"));
+            resultLocation = new LatLng(locationObj.getDouble("lat"), locationObj.getDouble("lng"));
 
         } catch (JSONException e) {
         }
         return resultLocation;
     }
+
     public static String[][] autocomplete(String input, LocationClient mLocationClient) {
-       String[][] resultList = null;
+        String[][] resultList = null;
 
         HttpURLConnection conn = null;
         StringBuilder jsonResults = new StringBuilder();
@@ -123,6 +119,7 @@ public class GoogleMapsAPI {
 
         return resultList;
     }
+
     public static boolean servicesConnected(Activity context) {
         // Check that Google Play services is available
         int resultCode =

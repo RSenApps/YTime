@@ -1,16 +1,13 @@
 package com.RSen.YTime;
 
 import android.app.Activity;
-import android.app.AlarmManager;
-import android.content.Context;
-import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
@@ -18,11 +15,10 @@ import android.widget.Toast;
 
 import com.android.datetimepicker.time.RadialPickerLayout;
 import com.android.datetimepicker.time.TimePickerDialog;
-import com.getpebble.android.kit.PebbleKit;
-import com.getpebble.android.kit.util.PebbleDictionary;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -36,8 +32,8 @@ import java.util.Calendar;
 
 
 public class CreateAlarmActivity extends Activity implements
-        GooglePlayServicesClient.ConnectionCallbacks,
-        GooglePlayServicesClient.OnConnectionFailedListener{
+        GooglePlayServicesClient.ConnectionCallbacks, com.google.android.gms.location.LocationListener,
+        GooglePlayServicesClient.OnConnectionFailedListener {
     LocationClient mLocationClient;
     GoogleMap map;
     int hours = 12;
@@ -46,6 +42,8 @@ public class CreateAlarmActivity extends Activity implements
     double lat = 0;
     double lng = 0;
     String placeName;
+    private boolean followUser;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +54,7 @@ public class CreateAlarmActivity extends Activity implements
             dataSource = new AlarmsDataSource(this);
 
             MapFragment mapFragment = ((MapFragment) getFragmentManager().findFragmentById(R.id.map));
+
             map = mapFragment.getMap();
             map.setTrafficEnabled(true);
             map.setMyLocationEnabled(true);
@@ -104,19 +103,21 @@ public class CreateAlarmActivity extends Activity implements
                             dataSource.addLocation(placeWords[0] + " " + placeWords[1] + " " + placeWords[2] + " " + placeWords[3], lat, lng);
                             dataSource.close();
                             AlarmHelper.setAlarms(CreateAlarmActivity.this, mLocationClient);
+                            finish();
                         }
                     });
-                    if (placeName.equals(null) || placeName.length() < 1)
-                    {
+                    if (placeName == null || placeName.length() < 1) {
                         Toast.makeText(CreateAlarmActivity.this, "Please enter a location...", Toast.LENGTH_LONG).show();
+                    } else {
+                        thread.start();
                     }
-                    thread.start();
-                    finish();
+
 
                 }
             });
         }
     }
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -128,6 +129,7 @@ public class CreateAlarmActivity extends Activity implements
         // Connect the client.
         mLocationClient.connect();
     }
+
     /*
      * Called when the Activity is no longer visible.
      */
@@ -138,13 +140,16 @@ public class CreateAlarmActivity extends Activity implements
         dataSource.close();
         super.onStop();
     }
+
     @Override
     public void onConnected(Bundle dataBundle) {
         Location location = mLocationClient.getLastLocation();
+        mLocationClient.requestLocationUpdates(LocationRequest.create().setExpirationDuration(3000), this);
         map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude())));
 
         // Zoom in the Google Map
         map.animateCamera(CameraUpdateFactory.zoomTo(12));
+
         final AutoCompleteTextView autoCompView = (AutoCompleteTextView) findViewById(R.id.location_input);
         final PlacesAutoCompleteAdapter adapter = new PlacesAutoCompleteAdapter(this, mLocationClient, android.R.layout.simple_list_item_1);
         autoCompView.setAdapter(adapter);
@@ -169,7 +174,7 @@ public class CreateAlarmActivity extends Activity implements
                     @Override
                     public void run() {
                         Message message = handler.obtainMessage();
-                        LatLng latLng  = GoogleMapsAPI.getLocationForPlace(adapter.getPlaceID(i));
+                        LatLng latLng = GoogleMapsAPI.getLocationForPlace(adapter.getPlaceID(i));
                         lat = latLng.latitude;
                         lng = latLng.longitude;
                         message.obj = latLng;
@@ -177,12 +182,23 @@ public class CreateAlarmActivity extends Activity implements
                     }
                 });
                 thread.start();
+                InputMethodManager imm = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+                imm.toggleSoftInput(InputMethodManager.HIDE_IMPLICIT_ONLY, 0);
 
             }
         });
 
 
     }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        if (followUser) {
+            map.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location.getLatitude(), location.getLongitude())));
+        }
+    }
+
+
     /*
      * Called by Location Services if the connection to the
      * location client drops because of an error.
@@ -190,6 +206,7 @@ public class CreateAlarmActivity extends Activity implements
     @Override
     public void onDisconnected() {
     }
+
     /*
      * Called by Location Services if the attempt to
      * Location Services fails.

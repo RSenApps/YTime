@@ -17,6 +17,7 @@ public class AlarmService extends Service implements
         GooglePlayServicesClient.OnConnectionFailedListener {
     LocationClient mLocationClient;
     long id;
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -24,19 +25,16 @@ public class AlarmService extends Service implements
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent!= null) {
+        if (intent != null) {
             id = intent.getLongExtra("id", -1);
-            if (id != -1)
-            {
+            if (id != -1) {
                 mLocationClient = new LocationClient(this, this, this);
                 mLocationClient.connect();
 
-            }
-            else {
+            } else {
                 stopSelf();
             }
-        }
-        else {
+        } else {
             stopSelf();
         }
 
@@ -49,6 +47,7 @@ public class AlarmService extends Service implements
         mLocationClient.disconnect();
         super.onDestroy();
     }
+
     @Override
     public void onConnected(Bundle dataBundle) {
         AlarmHelper.updateAlarmTime(this, id, mLocationClient);
@@ -56,6 +55,7 @@ public class AlarmService extends Service implements
         stopSelf();
 
     }
+
     /*
      * Called by Location Services if the connection to the
      * location client drops because of an error.
@@ -63,6 +63,7 @@ public class AlarmService extends Service implements
     @Override
     public void onDisconnected() {
     }
+
     /*
      * Called by Location Services if the attempt to
      * Location Services fails.

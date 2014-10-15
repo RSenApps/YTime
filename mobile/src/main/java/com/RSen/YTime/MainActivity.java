@@ -3,16 +3,12 @@ package com.RSen.YTime;
 import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.media.Image;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
@@ -22,14 +18,13 @@ import com.getpebble.android.kit.PebbleKit;
 import com.melnykov.fab.FloatingActionButton;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 
 public class MainActivity extends Activity {
     ExpandableListAdapter listAdapter;
     ExpandableListView expListView;
+
     private BroadcastReceiver updateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -49,8 +44,12 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if (PebbleKit.isWatchConnected(this)) {
-            startService(new Intent(this, PebbleListeningService.class));
+        try {
+            if (PebbleKit.isWatchConnected(this)) {
+                startService(new Intent(this, PebbleListeningService.class));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         expListView = (ExpandableListView) findViewById(R.id.expandableListView);
         FloatingActionButton floatingActionButton = (FloatingActionButton) findViewById(R.id.add);
@@ -114,8 +113,7 @@ public class MainActivity extends Activity {
             if (uri == null) {
                 alarm.setRingtoneURI(null);
                 alarm.setRingtoneName("Silent");
-            }
-            else {
+            } else {
                 alarm.setRingtoneURI(uri.toString());
                 alarm.setRingtoneName(RingtoneManager.getRingtone(this, uri).getTitle(this));
             }
